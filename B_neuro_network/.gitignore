@@ -1,0 +1,34 @@
+# ── 构建产物 ──────────────────────────────
+build/
+cmake-build-*/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.pdb
+*.ilk
+
+# ── 输入素材：图片与真值入库，视频太大不入库 ──
+# 三张图（各约 40 KB）和同名真值 md（各约 2 KB）体积很小，入库后
+# 别人 clone 下来直接就能跑 --images，不需要再额外找材料。
+data/original/videos/*
+!data/original/videos/.gitkeep
+
+# ── 运行产物：程序可重新生成，不入库 ────────
+data/processed/**
+
+# ── 网络模型 ──────────────────────────────
+# B 方案需要两个 onnx：
+#   mlp.onnx                       314 KB  数字识别
+#   Infantry-v8n-...onnx           6.3 MB  装甲板检测 + 四关键点
+# 合计约 6.6 MB，在 GitHub 单文件 100 MB 限制之内，直接入库，
+# 保证 clone 后无需再找模型即可运行。
+# 若以后换更大的模型，可改为忽略并用下载脚本替代。
+
+# ── 编辑器 / 系统 ─────────────────────────
+.vscode/
+.idea/
+*.user
+.DS_Store
+Thumbs.db

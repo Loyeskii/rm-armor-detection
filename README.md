@@ -1,17 +1,16 @@
 # RM 装甲板识别与位置解算 · 方案 A（传统视觉）
 
 用纯 C++ + OpenCV 实现 RoboMaster 装甲板的**识别 → 数字分类 → 位置解算 → 结果展示/误差评估**。
-本目录是作业中的**传统视觉方案**；神经网络方案见同级目录 `B_neuro_network/`。
+本目录是**传统视觉方案**；神经网络方案见同级目录 `B_neuro_network/`。
 
-对应作业要求：
+达成效果：
 
-| 作业条目 | 本工程对应内容 |
+| 效果 | 对应工程内容 |
 |---|---|
 | 1 传统方案结合数字网络完成灯条配对 | `armor_detector` 找灯条并配对，`number_classifier` 用 `mlp.onnx` 识别号码，识别失败即丢弃该配对（`require_digit: 1`） |
 | 2 解算位置并说明坐标约定、处理畸变 | `camera` 去畸变、`pnp_solver` 用 `SOLVEPNP_IPPE` 求位姿 |
 | 3 视频画框 + 展示数字 | `--video`，输出 `data/processed/videos/A_traditional_annotated.mp4` |
 | 4 图片坐标 vs 真值 | `--images`，输出标注图 + `A_traditional_error.csv` |
-| 5 模块划分 / CMake / 头实现分离 / 异常处理 | 见“目录约定”与“算法流程与模块对应” |
 
 ---
 
@@ -113,13 +112,13 @@ A_conventional/
 
 ---
 
-## 5. 素材放哪里
+## 5. 各种素材位置
 
 | 素材 | 放置位置 | 是否入库 | 来源 |
 |---|---|---|---|
-| 三张原始图 | `data/original/images/1.jpg` `2.jpg` `3.jpg` | ✅ 入库 | 作业材料 |
-| 三张图对应的真值 | `data/original/images/1.md` `2.md` `3.md` | ✅ 入库 | 作业材料 `图1/2/3.md`，重命名为同名以便按文件名配对 |
-| 测试视频 | `data/original/videos/2026-05-20_23-57-31.avi` | ❌ **不入库**（64 MB） | 作业材料，请自行放入 |
+| 三张原始图 | `data/original/images/1.jpg` `2.jpg` `3.jpg` | ✅ 入库 | 示例材料 |
+| 三张图对应的真值 | `data/original/images/1.md` `2.md` `3.md` | ✅ 入库 | 示例材料 `图1/2/3.md`，重命名为同名以便按文件名配对 |
+| 测试视频 | `data/original/videos/2026-05-20_23-57-31.avi` | ❌ **不入库**（64 MB） | 示例材料，文件过大不上传，需要自行放入 |
 | 数字识别网络 | `models/mlp.onnx` | ✅ 入库（314 KB） | `chenjunnn/rm_auto_aim` → `armor_detector/model/mlp.onnx` |
 
 > 视频缺失时程序会打印 `[error] 打不开视频: <路径>` 并正常退出，不会崩溃。
@@ -131,7 +130,7 @@ A_conventional/
 | 参数 | `config.yaml`（图片） | `config_video.yaml`（视频） | 原因 |
 |---|---|---|---|
 | `armor.small_width/height` | **0.060 / 0.056 m** | **0.135 / 0.125 m** | 仿真车装甲板实测约 60 mm，不是真实标准 135 mm |
-| `detect.use_blue / use_red` | 1 / 1 | 1 / 1 | 两种颜色同时检测；配对要求同色，互不干扰 |
+| `detect.use_blue / use_red` | 1 / 1 | 1 / 1 | 两种颜色同时检测；同一装甲板的两个灯条配对要求同色，互不干扰 |
 | `thresh.require_digit` | **1** | **0** | 见第 9 节 |
 
 切换方式：`--config config/config_video.yaml`。
@@ -167,7 +166,7 @@ image,armor,x_meas,y_meas,z_meas,x_truth,y_truth,z_truth,dx,dy,dz,err3d_m
 ⑨ 误差评估      evaluator.cpp          解析 图N.md 的“1.1 相机光学系下”表格 → Δ = 计算 − 真值
 ```
 
-### 坐标与单位约定（作业第 2 条）
+### 坐标与单位约定
 
 - **坐标系**：相机光学系，`x` 向右、`y` 向下、`z` 沿光轴向前（OpenCV 约定），与真值 md 一致
 - **单位**：米（m）
@@ -185,11 +184,8 @@ image,armor,x_meas,y_meas,z_meas,x_truth,y_truth,z_truth,dx,dy,dz,err3d_m
 
 ## 10. 已知限制
 
-1. **装甲板尺寸是标定值，不是题给参数。** 三张仿真图反推出板宽约 60 mm（标准 RM 小装甲板是 135 mm）。该值用 1.jpg 标定、2.jpg 与 3.jpg 独立验证，报告中有说明；换一批素材需重新标定。
-2. **单目单视图的尺度歧义。** 不给真实尺寸时绝对距离无法唯一确定；斜视角度大的装甲板（如 2.jpg 右板）位姿歧义更明显，`z` 误差偏大。
-3. **真实录像的误检。** `config_video.yaml` 面向实拍（灯条为过曝白 / 偏红），背景中的高亮结构（如明亮窗框）偶尔会被误判为灯条。
-4. **数字网络对仿真渲染的泛化。** `mlp.onnx` 在真实比赛图像上训练，仿真渲染的字形与之差异较大；ROI 几何（灯条占 12/28 高度、画布宽 32、裁中间 20 列）严格按训练时的预处理实现。
-5. **只露出单根灯条时不解算。** 单灯条无法构成四边形，PnP 无解，该候选会被跳过（属于“解算失败”的合法分支）。
+1. **装甲板尺寸是标定值，不是题给参数。** 板宽约 60 mm（标准 RM 小装甲板是 135 mm）。该值用 1.jpg 标定、2.jpg 与 3.jpg 独立验证，换一批素材需重新标定。
+2. **只露出单根灯条时不解算。** 单灯条无法构成四边形，PnP 无解，该候选会被跳过。
 
 ---
 

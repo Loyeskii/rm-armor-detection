@@ -19,10 +19,10 @@ data/original/videos/*
 data/processed/**
 
 # ── 网络模型 ──────────────────────────────
-# B 方案需要两个 onnx：
-#   mlp.onnx                       314 KB  数字识别
-#   Infantry-v8n-...onnx           6.3 MB  装甲板检测 + 四关键点
-# 合计约 6.6 MB，在 GitHub 单文件 100 MB 限制之内，直接入库，
+# B 方案需要一个 onnx（检测网络）：
+#   Infantry-v8n-fp32.onnx         12.7 MB  装甲板检测 + 四关键点 + 号码类别
+#   Infantry-v8n-fp16-...onnx       6.4 MB  原始版本，保留作参考（OpenCV 加载不了）
+# 单个约 13 MB，在 GitHub 单文件 100 MB 限制之内，直接入库，
 # 保证 clone 后无需再找模型即可运行。
 # 若以后换更大的模型，可改为忽略并用下载脚本替代。
 

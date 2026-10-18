@@ -1,0 +1,59 @@
+%YAML:1.0
+---
+# ============================================================
+# 视频专用配置（真实比赛录像）
+# 与 config.yaml 唯一的区别：装甲板尺寸用真实标准值 135x125mm
+# 用法： armor_neural.exe --video --config config/config_video.yaml
+# ============================================================
+# ============================================================
+# 神经网络方案 · 参数配置
+# 第一行必须是 %YAML:1.0（OpenCV FileStorage 的要求）。
+# 注意：不要写跨行数组，需要成组的数值请拆成独立标量。
+# ============================================================
+
+camera:
+  # 内参是对这个分辨率标定的；实际图像分辨率不同时程序按比例缩放 fx/fy/cx/cy
+  calib_width: 1358
+  calib_height: 1058
+  fx: 2362.2795952460974
+  fy: 2336.1916035376717
+  cx: 679.17513921636282
+  cy: 529.06858905837635
+  k1: -0.098561592108101559
+  k2: 0.11173066531932681
+  p1: -0.0038352945867108721
+  p2: -0.0020421443354436304
+  k3: 0.0
+
+armor_size:
+  # 与方案 A 相同：仿真车的装甲板实测约 60 mm，不是真实标准 135 mm。
+  # 误差整体等比放大时，多半就是这个假设不准。
+  small_w: 0.135
+  small_h: 0.125
+  large_w: 0.225
+  large_h: 0.125
+
+detect:
+  # 注意这里是 fp32 版本：原始权重是 fp16，OpenCV 的 DNN 无法解析
+  # （Conv 权重为 fp16 + 图中有 Cast 节点），已转换为纯 fp32，见 README 说明
+  model: models/Infantry-v8n-fp32.onnx
+  input_w: 640
+  input_h: 480
+  conf_thres: 0.25      # 类别置信度阈值
+  nms_thres: 0.45       # NMS 的 IoU 阈值
+  max_dets: 20          # NMS 后最多保留数量
+  swap_rb: 1            # 网络用 RGB 训练，BGR 输入需换通道
+  large_aspect: 2.5     # 框宽高比超过该值判为大装甲板（实测小装甲板约 1.9，大板约 3.2）
+
+thresh:
+  max_range_m: 15.0     # 解算距离上限，超过视为无效解
+  min_class_conf: 0.30  # 低于该置信度时号码显示为 "?"
+
+model:
+  labels: config/labels.txt
+
+io:
+  video: ../data/original/videos/2026-05-20_23-57-31.avi
+  video_out: ../data/processed/B/videos/B_neural_annotated.mp4
+  images_dir: ../data/original/images
+  images_out: ../data/processed/B/images

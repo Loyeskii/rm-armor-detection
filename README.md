@@ -64,7 +64,7 @@ armor_traditional.exe --video     :: 视频：逐帧画框
 | 三张原始图 + 真值 md | `data/original/images/` | ✅ |
 | 相机内参 / 畸变 | `重投影误差.txt` | ✅ |
 | 测试视频（64 MB） | `data/original/videos/2026-05-20_23-57-31.avi` | 未上传，需自行放入测试视频 |
-| 数字网络 `mlp.onnx` | 两个方案的 `models/` | ✅ 314 KB |
+| 数字网络 `mlp.onnx` | `A_conventional/models/` | ✅ 314 KB |
 | 装甲板检测网络 `Infantry-v8n` | `B_neuro_network/models/` | ✅ 6.3 MB |
 
 ---

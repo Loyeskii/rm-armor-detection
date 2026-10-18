@@ -107,7 +107,7 @@ model:
   # 这些常量写在 number_classifier.cpp 里，不开放配置，避免改坏后与训练分布不一致
 
 io:
-  video: data/original/videos/2026-05-20_23-57-31.avi
-  video_out: data/processed/videos/A_traditional_annotated.mp4
-  images_dir: data/original/images
-  images_out: data/processed/images
+  video: ../data/original/videos/2026-05-20_23-57-31.avi
+  video_out: ../data/processed/A/videos/A_traditional_annotated.mp4
+  images_dir: ../data/original/images
+  images_out: ../data/processed/A/images

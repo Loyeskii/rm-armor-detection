@@ -1,28 +1,23 @@
 # RM 装甲板识别与位置解算
 
-RoboMaster 27 赛季算法组视觉侧第二周作业：用 **C++ + OpenCV** 完成装甲板识别与位置解算，要求**传统视觉**与**神经网络**两种方案各做一遍，并对同一批素材给出误差对比。
+用 **C++ + OpenCV** 完成装甲板识别与位置解算，使用**传统视觉**与**神经网络**两种方案各做一遍，并对同一批素材给出误差对比。
 
 本仓库包含两套独立工程：
 
 ```
 02_Recognition/
-├── A_conventional/       传统视觉方案：灯条法 + 数字网络
+├── A_conventional/       传统视觉方案：检测识别灯条 + 神经网络识别数字
 ├── B_neuro_network/      神经网络方案：YOLOv8-pose 检测网络
-├── 1/ 2/ 3/              三组原始素材（原始图 + 真值标注图 + 真值 md）
-├── 视觉第二周作业.md      作业原文
+├── data/
+│   ├── original/         素材（A/B 共用）
+│   │   ├── images/       三张图 + 真值 md
+│   │   └── videos/       测试视频（未上传，需放入测试视频）
+│   └── processed/A/      A 的输出：标注图、误差表、标注视频
 └── 重投影误差.txt         相机内参与畸变系数
 ```
 
-> 两个子工程互相独立：各有 `CMakeLists.txt`、`include/`、`src/`、`config/`、`models/`、`data/`，可单独构建运行。
-
----
-
-## 方案进度
-
-| 方案 | 状态 | 说明 |
-|---|---|---|
-| **A 传统视觉** | ✅ 完成 | 灯条检测 + 几何配对 + 数字网络分类 + PnP 解算；图片与视频均已跑通 |
-| **B 神经网络** | 🚧 进行中 | 使用 `Infantry-v8n`（YOLOv8-pose，输出框 + 四关键点） |
+> 两个子工程各有 `CMakeLists.txt`、`include/`、`src/`、`config/`、`models/`，可单独构建运行。
+> 素材统一放在根目录 `data/`，由配置里的相对路径 `../data/...` 引用。
 
 ---
 
@@ -58,7 +53,7 @@ armor_traditional.exe --video     :: 视频：逐帧画框
 
 视频：531 帧、1440×1080、30 fps，累计识别 360 次。
 
-完整误差表见 `A_conventional/data/processed/images/A_traditional_error.csv`（运行后生成）。
+完整误差表见 `data/processed/A/images/A_traditional_error.csv`（运行后自动生成）。
 
 ---
 
@@ -66,10 +61,9 @@ armor_traditional.exe --video     :: 视频：逐帧画框
 
 | 素材 | 位置 | 是否入库 |
 |---|---|---|
-| 三张原始图 + 真值 md | `A_conventional/data/original/images/`、`B_neuro_network/data/original/images/` | ✅ |
-| 三组原始素材（含真值标注图） | `1/` `2/` `3/` | ✅ |
+| 三张原始图 + 真值 md | `data/original/images/` | ✅ |
 | 相机内参 / 畸变 | `重投影误差.txt` | ✅ |
-| 测试视频（64 MB） | `2026-05-20_23-57-31.avi` | ❌ 体积过大，需自行放入 `A_conventional/data/original/videos/` |
+| 测试视频（64 MB） | `data/original/videos/2026-05-20_23-57-31.avi` | 未上传，需自行放入测试视频 |
 | 数字网络 `mlp.onnx` | 两个方案的 `models/` | ✅ 314 KB |
 | 装甲板检测网络 `Infantry-v8n` | `B_neuro_network/models/` | ✅ 6.3 MB |
 
@@ -80,10 +74,3 @@ armor_traditional.exe --video     :: 视频：逐帧画框
 - Windows 10/11 x64，MSVC 19.42（VS 2022 BuildTools），CMake ≥ 3.16
 - OpenCV **4.10.0**（Windows 预编译包，`vc16`），解压到 `C:\opencv`
 - 仅依赖 OpenCV：core / imgproc / imgcodecs / videoio / highgui / calib3d / dnn
-
----
-
-## 分支与提交
-
-- `main`：稳定可运行的主线
-- `feat/B-neuro-network`：方案 B 开发分支，完成后通过 PR 合并

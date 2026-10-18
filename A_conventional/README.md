@@ -9,7 +9,7 @@
 |---|---|
 | 1 传统方案结合数字网络完成灯条配对 | `armor_detector` 找灯条并配对，`number_classifier` 用 `mlp.onnx` 识别号码，识别失败即丢弃该配对（`require_digit: 1`） |
 | 2 解算位置并说明坐标约定、处理畸变 | `camera` 去畸变、`pnp_solver` 用 `SOLVEPNP_IPPE` 求位姿 |
-| 3 视频画框 + 展示数字 | `--video`，输出 `data/processed/videos/A_traditional_annotated.mp4` |
+| 3 视频画框 + 展示数字 | `--video`，输出 `data/processed/A/videos/A_traditional_annotated.mp4` |
 | 4 图片坐标 vs 真值 | `--images`，输出标注图 + `A_traditional_error.csv` |
 
 ---
@@ -101,13 +101,21 @@ A_conventional/
 │   └── evaluator.hpp        真值解析与误差统计
 ├── src/                     ← 实现文件：只写定义
 │   └── （与 include/ 一一对应）+ main.cpp
+└── （本工程不含 data/，素材统一放在仓库根的 data/，见第 5 节）
+```
+
+仓库根的素材与产物（A、B 共用同一份输入）：
+
+```
+02_Recognition/
 └── data/
     ├── original/
     │   ├── images/          ← 输入：三张图 + 真值 md（已入库）
     │   └── videos/          ← 输入：测试视频（**不入库**，64 MB）
     └── processed/
-        ├── images/          ← 输出：标注图 + A_traditional_error.csv
-        └── videos/          ← 输出：A_traditional_annotated.mp4
+        └── A/
+            ├── images/      ← 输出：标注图 + A_traditional_error.csv
+            └── videos/      ← 输出：A_traditional_annotated.mp4
 ```
 
 ---
@@ -141,8 +149,8 @@ A_conventional/
 
 | 模式 | 输出 |
 |---|---|
-| `--images` | `data/processed/images/{1,2,3}_annotated.png`（框 + 号码 + 坐标 + 三维坐标轴）<br>`data/processed/images/A_traditional_error.csv`（Δx/Δy/Δz 与三维误差） |
-| `--video` | `data/processed/videos/A_traditional_annotated.mp4`（1440×1080, 30 fps，逐帧画框） |
+| `--images` | `data/processed/A/images/{1,2,3}_annotated.png`（框 + 号码 + 坐标 + 三维坐标轴）<br>`data/processed/A/images/A_traditional_error.csv`（Δx/Δy/Δz 与三维误差） |
+| `--video` | `data/processed/A/videos/A_traditional_annotated.mp4`（1440×1080, 30 fps，逐帧画框） |
 
 误差表格式（`计算值 − 真值`，单位 m）：
 
